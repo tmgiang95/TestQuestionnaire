@@ -30,6 +30,7 @@ import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,9 +42,7 @@ import java.nio.ByteBuffer;
 
 public abstract class CameraActivity extends AppCompatActivity
         implements ImageReader.OnImageAvailableListener,
-        Camera.PreviewCallback,
-        CompoundButton.OnCheckedChangeListener,
-        View.OnClickListener {
+        Camera.PreviewCallback {
     private static final Logger LOGGER = new Logger();
 
     private static final int PERMISSIONS_REQUEST = 1;
@@ -62,15 +61,19 @@ public abstract class CameraActivity extends AppCompatActivity
     private Runnable postInferenceCallback;
     private Runnable imageConverter;
 
+    private int currentQuestionIdx = 0;
     private LinearLayout bottomSheetLayout;
-    private LinearLayout gestureLayout;
-    private BottomSheetBehavior<LinearLayout> sheetBehavior;
+    private RelativeLayout buttonLike;
+    private RelativeLayout buttonDislike;
+    private TextView tvQuestion;
+//    private LinearLayout gestureLayout;
+//    private BottomSheetBehavior<LinearLayout> sheetBehavior;
 
     protected TextView frameValueTextView, cropValueTextView, inferenceTimeTextView;
-    protected ImageView bottomSheetArrowImageView;
-    private ImageView plusImageView, minusImageView;
-    private SwitchCompat apiSwitchCompat;
-    private TextView threadsTextView;
+//    protected ImageView bottomSheetArrowImageView;
+//    private ImageView plusImageView, minusImageView;
+//    private SwitchCompat apiSwitchCompat;
+//    private TextView threadsTextView;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -86,17 +89,48 @@ public abstract class CameraActivity extends AppCompatActivity
             requestPermission();
         }
 
-        threadsTextView = findViewById(R.id.threads);
-        plusImageView = findViewById(R.id.plus);
-        minusImageView = findViewById(R.id.minus);
-        apiSwitchCompat = findViewById(R.id.api_info_switch);
+//        threadsTextView = findViewById(R.id.threads);
+//        plusImageView = findViewById(R.id.plus);
+//        minusImageView = findViewById(R.id.minus);
+//        apiSwitchCompat = findViewById(R.id.api_info_switch);
         bottomSheetLayout = findViewById(R.id.bottom_sheet_layout);
-        gestureLayout = findViewById(R.id.gesture_layout);
+        buttonLike = findViewById(R.id.ibLike);
+        buttonDislike = findViewById(R.id.ibDislike);
+        tvQuestion = findViewById(R.id.tvQuestion);
+//        gestureLayout = findViewById(R.id.gesture_layout);
 //        sheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
-        bottomSheetArrowImageView = findViewById(R.id.bottom_sheet_arrow);
+//        bottomSheetArrowImageView = findViewById(R.id.bottom_sheet_arrow);
+        ViewGroup.LayoutParams params = bottomSheetLayout.getLayoutParams();
+        params.height = getResources().getDisplayMetrics().heightPixels / 3;
+        bottomSheetLayout.setLayoutParams(params);
+        tvQuestion.setHeight(getResources().getDisplayMetrics().heightPixels / 5);
 
+        String[] strQuestions = {"Trong vòng 21 ngày qua Anh/Chị có thấy xuất hiện dấu hiệu nào như ho, sốt, khó thở viêm phổi không ?", "Trong vòng 21 ngày qua, Anh/Chị có tiếp xúc với:\n-Người bệnh hoặc nghi ngờ, mắc bệnh COVID-19\n-Người từ nước có bệnh COVID-19\n-Người có biểu hiện (Sốt, ho, khó thở , Viêm phổi) không?", "Hiện tại Anh/Chị có các bệnh nào dưới đây:\n-Bệnh gan mãn tĩnh\n-Bệnh máu mãn tính\n-Bệnh phổi mãn tính\n-Bệnh thận mãn tĩnh\n-Suy giảm miễn dịch"};
+        tvQuestion.setText(strQuestions[currentQuestionIdx]);
+        buttonLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentQuestionIdx < strQuestions.length - 1) {
+                    currentQuestionIdx++;
+                    tvQuestion.setText(strQuestions[currentQuestionIdx]);
+                } else {
+                    Toast.makeText(CameraActivity.this, "Complete ", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        buttonDislike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentQuestionIdx < strQuestions.length - 1) {
+                    currentQuestionIdx++;
+                    tvQuestion.setText(strQuestions[currentQuestionIdx]);
+                } else {
+                    Toast.makeText(CameraActivity.this, "Complete ", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
-//        ViewTreeObserver vto = gestureLayout.getViewTreeObserver();
+        //        ViewTreeObserver vto = gestureLayout.getViewTreeObserver();
 //        vto.addOnGlobalLayoutListener(
 //                new ViewTreeObserver.OnGlobalLayoutListener() {
 //                    @Override
@@ -143,14 +177,14 @@ public abstract class CameraActivity extends AppCompatActivity
 //                    public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
 //                });
 
-        frameValueTextView = findViewById(R.id.frame_info);
-        cropValueTextView = findViewById(R.id.crop_info);
-        inferenceTimeTextView = findViewById(R.id.inference_info);
-
-        apiSwitchCompat.setOnCheckedChangeListener(this);
-
-        plusImageView.setOnClickListener(this);
-        minusImageView.setOnClickListener(this);
+//        frameValueTextView = findViewById(R.id.frame_info);
+//        cropValueTextView = findViewById(R.id.crop_info);
+//        inferenceTimeTextView = findViewById(R.id.inference_info);
+//
+//        apiSwitchCompat.setOnCheckedChangeListener(this);
+//
+//        plusImageView.setOnClickListener(this);
+//        minusImageView.setOnClickListener(this);
     }
 
     protected int[] getRgbBytes() {
@@ -384,7 +418,6 @@ public abstract class CameraActivity extends AppCompatActivity
     }
 
 
-
     private String chooseCamera() {
         final CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
@@ -421,6 +454,7 @@ public abstract class CameraActivity extends AppCompatActivity
 
         return null;
     }
+
     protected void setFragment() {
         String cameraId = chooseCamera();
         Fragment fragment;
@@ -487,33 +521,33 @@ public abstract class CameraActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        setUseNNAPI(isChecked);
-        if (isChecked) apiSwitchCompat.setText("NNAPI");
-        else apiSwitchCompat.setText("TFLITE");
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.plus) {
-            String threads = threadsTextView.getText().toString().trim();
-            int numThreads = Integer.parseInt(threads);
-            if (numThreads >= 9) return;
-            numThreads++;
-            threadsTextView.setText(String.valueOf(numThreads));
-            setNumThreads(numThreads);
-        } else if (v.getId() == R.id.minus) {
-            String threads = threadsTextView.getText().toString().trim();
-            int numThreads = Integer.parseInt(threads);
-            if (numThreads == 1) {
-                return;
-            }
-            numThreads--;
-            threadsTextView.setText(String.valueOf(numThreads));
-            setNumThreads(numThreads);
-        }
-    }
+//    @Override
+//    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//        setUseNNAPI(isChecked);
+//        if (isChecked) apiSwitchCompat.setText("NNAPI");
+//        else apiSwitchCompat.setText("TFLITE");
+//    }
+//
+//    @Override
+//    public void onClick(View v) {
+//        if (v.getId() == R.id.plus) {
+//            String threads = threadsTextView.getText().toString().trim();
+//            int numThreads = Integer.parseInt(threads);
+//            if (numThreads >= 9) return;
+//            numThreads++;
+//            threadsTextView.setText(String.valueOf(numThreads));
+//            setNumThreads(numThreads);
+//        } else if (v.getId() == R.id.minus) {
+//            String threads = threadsTextView.getText().toString().trim();
+//            int numThreads = Integer.parseInt(threads);
+//            if (numThreads == 1) {
+//                return;
+//            }
+//            numThreads--;
+//            threadsTextView.setText(String.valueOf(numThreads));
+//            setNumThreads(numThreads);
+//        }
+//    }
 
     protected void showFrameInfo(String frameInfo) {
         frameValueTextView.setText(frameInfo);
