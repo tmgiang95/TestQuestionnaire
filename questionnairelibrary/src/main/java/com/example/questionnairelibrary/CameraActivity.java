@@ -68,8 +68,6 @@ public abstract class CameraActivity extends AppCompatActivity
     private TextView tvQuestion;
 //    private LinearLayout gestureLayout;
 //    private BottomSheetBehavior<LinearLayout> sheetBehavior;
-
-    protected TextView frameValueTextView, cropValueTextView, inferenceTimeTextView;
 //    protected ImageView bottomSheetArrowImageView;
 //    private ImageView plusImageView, minusImageView;
 //    private SwitchCompat apiSwitchCompat;
@@ -177,7 +175,6 @@ public abstract class CameraActivity extends AppCompatActivity
 //                    public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
 //                });
 
-//        frameValueTextView = findViewById(R.id.frame_info);
 //        cropValueTextView = findViewById(R.id.crop_info);
 //        inferenceTimeTextView = findViewById(R.id.inference_info);
 //
@@ -549,17 +546,17 @@ public abstract class CameraActivity extends AppCompatActivity
 //        }
 //    }
 
-    protected void showFrameInfo(String frameInfo) {
-        frameValueTextView.setText(frameInfo);
-    }
-
-    protected void showCropInfo(String cropInfo) {
-        cropValueTextView.setText(cropInfo);
-    }
-
-    protected void showInference(String inferenceTime) {
-        inferenceTimeTextView.setText(inferenceTime);
-    }
+//    protected void showFrameInfo(String frameInfo) {
+//        frameValueTextView.setText(frameInfo);
+//    }
+//
+//    protected void showCropInfo(String cropInfo) {
+//        cropValueTextView.setText(cropInfo);
+//    }
+//
+//    protected void showInference(String inferenceTime) {
+//        inferenceTimeTextView.setText(inferenceTime);
+//    }
 
     protected abstract void processImage();
 
