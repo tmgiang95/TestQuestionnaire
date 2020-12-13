@@ -16,5 +16,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Intent intent = new Intent(getBaseContext(), DetectorActivity.class);
         startActivity(intent);
+        finish();
     }
 }

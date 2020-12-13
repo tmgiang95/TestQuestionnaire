@@ -37,6 +37,7 @@ import android.widget.Toast;
 import com.example.questionnairelibrary.env.ImageUtils;
 import com.example.questionnairelibrary.env.Logger;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.stepstone.stepper.StepperLayout;
 
 import java.nio.ByteBuffer;
 
@@ -63,15 +64,18 @@ public abstract class CameraActivity extends AppCompatActivity
 
     private int currentQuestionIdx = 0;
     private LinearLayout bottomSheetLayout;
-    private RelativeLayout buttonLike;
-    private RelativeLayout buttonDislike;
+    private LinearLayout buttonLike;
+    private LinearLayout buttonDislike;
+    private LinearLayout buttonBack;
+    private LinearLayout buttonNext;
     private TextView tvQuestion;
-//    private LinearLayout gestureLayout;
+    //    private LinearLayout gestureLayout;
 //    private BottomSheetBehavior<LinearLayout> sheetBehavior;
 //    protected ImageView bottomSheetArrowImageView;
 //    private ImageView plusImageView, minusImageView;
 //    private SwitchCompat apiSwitchCompat;
 //    private TextView threadsTextView;
+    private StepperLayout mStepperLayout;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -79,7 +83,9 @@ public abstract class CameraActivity extends AppCompatActivity
         super.onCreate(null);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        setContentView(R.layout.tfe_od_activity_camera);
+        setContentView(R.layout.stepper_layout);
+
+        mStepperLayout = findViewById(R.id.stepperLayout);
 
         if (hasPermission()) {
             setFragment();
@@ -94,6 +100,8 @@ public abstract class CameraActivity extends AppCompatActivity
         bottomSheetLayout = findViewById(R.id.bottom_sheet_layout);
         buttonLike = findViewById(R.id.ibLike);
         buttonDislike = findViewById(R.id.ibDislike);
+        buttonBack = findViewById(R.id.ibBack);
+        buttonNext = findViewById(R.id.ibNext);
         tvQuestion = findViewById(R.id.tvQuestion);
 //        gestureLayout = findViewById(R.id.gesture_layout);
 //        sheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
@@ -101,15 +109,23 @@ public abstract class CameraActivity extends AppCompatActivity
         ViewGroup.LayoutParams params = bottomSheetLayout.getLayoutParams();
         params.height = getResources().getDisplayMetrics().heightPixels / 3;
         bottomSheetLayout.setLayoutParams(params);
-        tvQuestion.setHeight(getResources().getDisplayMetrics().heightPixels / 5);
+        tvQuestion.setHeight(getResources().getDisplayMetrics().heightPixels / 6);
 
-        String[] strQuestions = {"Trong vòng 21 ngày qua Anh/Chị có thấy xuất hiện dấu hiệu nào như ho, sốt, khó thở viêm phổi không ?", "Trong vòng 21 ngày qua, Anh/Chị có tiếp xúc với:\n-Người bệnh hoặc nghi ngờ, mắc bệnh COVID-19\n-Người từ nước có bệnh COVID-19\n-Người có biểu hiện (Sốt, ho, khó thở , Viêm phổi) không?", "Hiện tại Anh/Chị có các bệnh nào dưới đây:\n-Bệnh gan mãn tĩnh\n-Bệnh máu mãn tính\n-Bệnh phổi mãn tính\n-Bệnh thận mãn tĩnh\n-Suy giảm miễn dịch"};
+        String[] strQuestions = {"Trong vòng 21 ngày qua Anh/Chị có thấy xuất hiện dấu hiệu nào như ho, sốt, khó thở viêm phổi không ?",
+                "Trong vòng 21 ngày qua, Anh/Chị có tiếp xúc với:\n-Người bệnh hoặc nghi ngờ, mắc bệnh COVID-19\n-Người từ nước có bệnh COVID-19\n-Người có biểu hiện (Sốt, ho, khó thở , Viêm phổi) không?",
+                "Hiện tại Anh/Chị có các bệnh nào dưới đây:\n-Bệnh gan mãn tĩnh\n-Bệnh máu mãn tính\n-Bệnh phổi mãn tính\n-Bệnh thận mãn tĩnh\n-Suy giảm miễn dịch",
+        "Cau 4",
+        "Cau 5",
+        "Cau 6"};
         tvQuestion.setText(strQuestions[currentQuestionIdx]);
+        mStepperLayout.setAdapter(new MyStepperAdapter(getSupportFragmentManager(), this,strQuestions.length));
+
         buttonLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (currentQuestionIdx < strQuestions.length - 1) {
                     currentQuestionIdx++;
+                    mStepperLayout.proceed();
                     tvQuestion.setText(strQuestions[currentQuestionIdx]);
                 } else {
                     Toast.makeText(CameraActivity.this, "Complete ", Toast.LENGTH_SHORT).show();
@@ -121,9 +137,34 @@ public abstract class CameraActivity extends AppCompatActivity
             public void onClick(View v) {
                 if (currentQuestionIdx < strQuestions.length - 1) {
                     currentQuestionIdx++;
+                    mStepperLayout.proceed();
                     tvQuestion.setText(strQuestions[currentQuestionIdx]);
                 } else {
                     Toast.makeText(CameraActivity.this, "Complete ", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        buttonNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentQuestionIdx < strQuestions.length - 1) {
+                    currentQuestionIdx++;
+                    mStepperLayout.proceed();
+                    tvQuestion.setText(strQuestions[currentQuestionIdx]);
+                } else {
+                    Toast.makeText(CameraActivity.this, "No more to next ", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        buttonBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentQuestionIdx > 0) {
+                    currentQuestionIdx--;
+                    tvQuestion.setText(strQuestions[currentQuestionIdx]);
+                    mStepperLayout.onBackClicked();
+                } else {
+                    Toast.makeText(CameraActivity.this, "No more to back ", Toast.LENGTH_SHORT).show();
                 }
             }
         });
